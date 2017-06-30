@@ -2,12 +2,13 @@ find_git_branch() {
   # Based on: http://stackoverflow.com/a/13003854/170413
   local branch
   eval find_git_added
+  eval find_git_commits
 
   if branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null); then
     if [[ "$branch" == "HEAD" ]]; then
       branch='detached*'
     fi
-    git_branch="($branch$git_add)"
+    git_branch="($branch$git_add$git_rev)"
   else
     git_branch=""
   fi
@@ -23,11 +24,20 @@ find_git_dirty() {
 }
 
 find_git_added() {
-  local status=$(git status -s 2> /dev/null | grep "^A\s")
+  local status=$(git status -s 2> /dev/null | grep "^\(A\|M\)")
   if [[ "$status" != "" ]]; then
     git_add='+'
   else
     git_add=''
+  fi
+}
+
+find_git_commits() {
+  local revlist=$(git rev-list --count origin ^HEAD 2> /dev/null)
+  if [[ "$revlist" != "0" ]]; then
+    git_rev='>'
+  else
+    git_rev=''
   fi
 }
 
