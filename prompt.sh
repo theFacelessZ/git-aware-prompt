@@ -1,11 +1,13 @@
 find_git_branch() {
   # Based on: http://stackoverflow.com/a/13003854/170413
   local branch
+  eval find_git_added
+
   if branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null); then
     if [[ "$branch" == "HEAD" ]]; then
       branch='detached*'
     fi
-    git_branch="($branch)"
+    git_branch="($branch$git_add)"
   else
     git_branch=""
   fi
@@ -17,6 +19,15 @@ find_git_dirty() {
     git_dirty='*'
   else
     git_dirty=''
+  fi
+}
+
+find_git_added() {
+  local status=$(git status -s 2> /dev/null | grep "^A\s")
+  if [[ "$status" != "" ]]; then
+    git_add='+'
+  else
+    git_add=''
   fi
 }
 
