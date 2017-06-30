@@ -35,7 +35,7 @@ find_git_added() {
 find_git_commits() {
   local revlist=$(git rev-list --count origin ^HEAD 2> /dev/null)
   if [[ "$revlist" != "0" ]]; then
-    git_rev='>'
+    git_rev='<'
   else
     git_rev=''
   fi
