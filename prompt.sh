@@ -15,7 +15,7 @@ find_git_branch() {
 }
 
 find_git_dirty() {
-  local status=$(git status --porcelain 2> /dev/null)
+  local status=$(git status --porcelain 2> /dev/null | grep "^??")
   if [[ "$status" != "" ]]; then
     git_dirty='*'
   else
@@ -24,7 +24,7 @@ find_git_dirty() {
 }
 
 find_git_added() {
-  local status=$(git status -s 2> /dev/null | grep "^\(A\|M\)")
+  local status=$(git status --porcelain 2> /dev/null | grep "^\(A\|M\)")
   if [[ "$status" != "" ]]; then
     git_add='+'
   else
@@ -33,9 +33,13 @@ find_git_added() {
 }
 
 find_git_commits() {
-  local revlist=$(git rev-list --count origin ^HEAD 2> /dev/null)
-  if [[ "$revlist" != "0" ]]; then
+  local revlist_outdated=$(git rev-list --count --min-age=HEAD origin ^HEAD 2> /dev/null)
+  local revlist_ahead=$(git rev-list --count --max-age=HEAD origin ^HEAD 2> /dev/null)  
+
+  if [[ "$revlist_outdated" != "0" ]]; then
     git_rev='<'
+  elif [[ "$revlist_ahead" -gt "1" ]]; then
+    git_rev='>'
   else
     git_rev=''
   fi
