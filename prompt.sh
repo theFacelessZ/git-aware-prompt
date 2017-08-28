@@ -15,7 +15,7 @@ find_git_branch() {
 }
 
 find_git_dirty() {
-  local status=$(git status --porcelain 2> /dev/null | grep "^??")
+  local status=$(git status --porcelain 2> /dev/null | egrep "^(((\s|.)+M)|\?+)")
   if [[ "$status" != "" ]]; then
     git_dirty='*'
   else
@@ -24,7 +24,7 @@ find_git_dirty() {
 }
 
 find_git_added() {
-  local status=$(git status --porcelain 2> /dev/null | grep "^\(A\|M\)")
+  local status=$(git status --porcelain 2> /dev/null | egrep "^(A|M)")
   if [[ "$status" != "" ]]; then
     git_add='+'
   else
